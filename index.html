@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Data Analysis Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+:root {
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+  --color-bg-1: rgba(59, 130, 246, 0.08);
+  --color-bg-2: rgba(245, 158, 11, 0.08);
+  --color-bg-3: rgba(34, 197, 94, 0.08);
+  --color-bg-4: rgba(239, 68, 68, 0.08);
+  --color-bg-5: rgba(147, 51, 234, 0.08);
+  --color-bg-6: rgba(249, 115, 22, 0.08);
+  --color-bg-7: rgba(236, 72, 153, 0.08);
+  --color-bg-8: rgba(6, 182, 212, 0.08);
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-primary-active: var(--color-teal-700);
+  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-btn-primary-text: var(--color-cream-50);
+  --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-teal-500);
+  --color-warning: var(--color-orange-500);
+  --color-info: var(--color-slate-500);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-gray-400-rgb: 119, 124, 124;
+    --color-teal-300-rgb: 50, 184, 198;
+    --color-gray-300-rgb: 167, 169, 169;
+    --color-gray-200-rgb: 245, 245, 245;
+    --color-bg-1: rgba(29, 78, 216, 0.15);
+    --color-bg-2: rgba(180, 83, 9, 0.15);
+    --color-bg-3: rgba(21, 128, 61, 0.15);
+    --color-bg-4: rgba(185, 28, 28, 0.15);
+    --color-bg-5: rgba(107, 33, 168, 0.15);
+    --color-bg-6: rgba(194, 65, 12, 0.15);
+    --color-bg-7: rgba(190, 24, 93, 0.15);
+    --color-bg-8: rgba(8, 145, 178, 0.15);
+    --color-background: var(--color-charcoal-700);
+    --color-surface: var(--color-charcoal-800);
+    --color-text: var(--color-gray-200);
+    --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+    --color-primary: var(--color-teal-300);
+    --color-primary-hover: var(--color-teal-400);
+    --color-primary-active: var(--color-teal-800);
+    --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+    --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+    --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-error: var(--color-red-400);
+    --color-success: var(--color-teal-300);
+    --color-warning: var(--color-orange-400);
+    --color-info: var(--color-gray-300);
+    --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+    --color-btn-primary-text: var(--color-slate-900);
+    --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-card-border-inner: rgba(var(--color-gray-400-rgb), 0.15);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-family-base);
+  background: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  padding: var(--space-16);
+}
+
+.sidebar h1 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-24);
+  color: var(--color-primary);
+}
+
+.nav-item {
+  padding: var(--space-12) var(--space-16);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-base);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.nav-item:hover {
+  background: var(--color-secondary);
+}
+
+.nav-item.active {
+  background: var(--color-primary);
+  color: var(--color-btn-primary-text);
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-32);
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-24);
+  margin-bottom: var(--space-24);
+  box-shadow: var(--shadow-sm);
+}
+
+.card h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-16);
+  color: var(--color-text);
+}
+
+.card h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-12);
+  color: var(--color-text);
+}
+
+.btn {
+  display: inline-block;
+  padding: var(--space-12) var(--space-20);
+  border: none;
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-btn-primary-text);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.btn-secondary:hover {
+  background: var(--color-secondary-hover);
+}
+
+.upload-area {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-32);
+  text-align: center;
+  margin-bottom: var(--space-24);
+  background: var(--color-bg-1);
+}
+
+.upload-area.dragover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-3);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+textarea {
+  width: 100%;
+  padding: var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  font-family: monospace;
+  font-size: var(--font-size-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  resize: vertical;
+  min-height: 120px;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-base);
+  background: var(--color-surface);
+  color: var(--color-text);
+  margin-bottom: var(--space-12);
+}
+
+label {
+  display: block;
+  margin-bottom: var(--space-8);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-16);
+  margin-bottom: var(--space-24);
+}
+
+.stat-card {
+  padding: var(--space-16);
+  background: var(--color-bg-2);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-card-border);
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-4);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-16);
+  font-size: var(--font-size-sm);
+}
+
+table th, table td {
+  padding: var(--space-8) var(--space-12);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+table th {
+  font-weight: var(--font-weight-semibold);
+  background: var(--color-bg-1);
+  color: var(--color-text);
+}
+
+table tr:hover {
+  background: var(--color-bg-2);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin-top: var(--space-16);
+}
+
+.form-group {
+  margin-bottom: var(--space-16);
+}
+
+.alert {
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-base);
+  margin-bottom: var(--space-16);
+  font-size: var(--font-size-sm);
+}
+
+.alert-success {
+  background: var(--color-bg-3);
+  border: 1px solid var(--color-success);
+  color: var(--color-success);
+}
+
+.alert-error {
+  background: var(--color-bg-4);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.alert-info {
+  background: var(--color-bg-1);
+  border: 1px solid var(--color-info);
+  color: var(--color-info);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-16);
+}
+
+.flex-row {
+  display: flex;
+  gap: var(--space-12);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.result-box {
+  background: var(--color-bg-5);
+  padding: var(--space-16);
+  border-radius: var(--radius-base);
+  margin-top: var(--space-16);
+  border: 1px solid var(--color-card-border);
+}
+
+.code {
+  background: var(--color-surface);
+  padding: var(--space-12);
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--space-24);
+  color: var(--color-text-secondary);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-16);
+}
+
+.widget {
+  background: var(--color-bg-3);
+  padding: var(--space-16);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-card-border);
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-list li {
+  padding: var(--space-12) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.feature-list li:last-child {
+  border-bottom: none;
+}
+
+.feature-list strong {
+  color: var(--color-primary);
+}
+
+.mb-16 { margin-bottom: var(--space-16); }
+.mt-16 { margin-top: var(--space-16); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <h1>Data Platform</h1>
+            <div class="nav-item active" data-section="upload">📤 Upload Data</div>
+            <div class="nav-item" data-section="overview">📊 Overview</div>
+            <div class="nav-item" data-section="visualizations">📈 Visualizations</div>
+            <div class="nav-item" data-section="statistics">📐 Statistics</div>
+            <div class="nav-item" data-section="ml">🤖 Machine Learning</div>
+            <div class="nav-item" data-section="transform">🔄 Transform</div>
+            <div class="nav-item" data-section="advanced-charts">📉 Advanced Charts</div>
+            <div class="nav-item" data-section="cleaning">🧹 Data Cleaning</div>
+            <div class="nav-item" data-section="export">💾 Export</div>
+            <div class="nav-item" data-section="sql">🔍 SQL Query</div>
+            <div class="nav-item" data-section="pivot">📋 Pivot Tables</div>
+            <div class="nav-item" data-section="forecasting">🔮 Forecasting</div>
+            <div class="nav-item" data-section="wrangling">🛠️ Data Wrangling</div>
+            <div class="nav-item" data-section="dashboard">📱 Dashboards</div>
+            <div class="nav-item" data-section="ai-insights">🧠 AI Insights</div>
+            <div class="nav-item" data-section="advanced-ml">🎯 Advanced ML</div>
+            <div class="nav-item" data-section="features">✨ Features</div>
+        </div>
+
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="section active" id="upload">
+                <div class="card">
+                    <h2>Upload Your Data</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <p>📁 Drag &amp; drop CSV/TSV file here or click to browse</p>
+                        <input type="file" id="fileInput" accept=".csv,.tsv,.txt">
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                    </div>
+                    <h3>Or Paste Data</h3>
+                    <textarea id="pasteData" placeholder="Paste CSV or TSV data here...\nExample:\nName,Age,Salary\nJohn,25,50000\nJane,30,60000"></textarea>
+                    <button class="btn btn-primary" onclick="parsePastedData()">Parse Data</button>
+                    <div id="uploadStatus"></div>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <div class="section" id="overview">
+                <div class="card">
+                    <h2>Dataset Overview</h2>
+                    <div class="stats-grid" id="overviewStats"></div>
+                    <h3>Data Preview</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="previewTable"></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualizations Section -->
+            <div class="section" id="visualizations">
+                <div class="card">
+                    <h2>Visualizations</h2>
+                    <div class="form-group">
+                        <label>Select Column for Histogram:</label>
+                        <select id="histColumn"></select>
+                        <button class="btn btn-primary" onclick="generateHistogram()">Generate Histogram</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="histChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Correlation Analysis</h3>
+                    <button class="btn btn-primary" onclick="calculateCorrelations()">Calculate Correlations</button>
+                    <div id="correlationResults"></div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="section" id="statistics">
+                <div class="card">
+                    <h2>Descriptive Statistics</h2>
+                    <div class="form-group">
+                        <label>Select Column:</label>
+                        <select id="statsColumn"></select>
+                        <button class="btn btn-primary" onclick="calculateStatistics()">Calculate Statistics</button>
+                    </div>
+                    <div id="statsResults"></div>
+                </div>
+            </div>
+
+            <!-- ML Section -->
+            <div class="section" id="ml">
+                <div class="card">
+                    <h2>Linear Regression</h2>
+                    <div class="form-group">
+                        <label>X Variable (Independent):</label>
+                        <select id="regressionX"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Y Variable (Dependent):</label>
+                        <select id="regressionY"></select>
+                    </div>
+                    <button class="btn btn-primary" onclick="runLinearRegression()">Run Regression</button>
+                    <div id="regressionResults"></div>
+                    <div class="chart-container">
+                        <canvas id="regressionChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>K-Means Clustering</h2>
+                    <div class="form-group">
+                        <label>Feature 1:</label>
+                        <select id="kmeansX"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Feature 2:</label>
+                        <select id="kmeansY"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Clusters (K):</label>
+                        <input type="number" id="kmeansK" value="3" min="2" max="10">
+                    </div>
+                    <button class="btn btn-primary" onclick="runKMeans()">Run Clustering</button>
+                    <div id="kmeansResults"></div>
+                    <div class="chart-container">
+                        <canvas id="kmeansChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transform Section -->
+            <div class="section" id="transform">
+                <div class="card">
+                    <h2>Data Normalization &amp; Standardization</h2>
+                    <div class="form-group">
+                        <label>Select Column:</label>
+                        <select id="transformColumn"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Method:</label>
+                        <select id="transformMethod">
+                            <option value="minmax">Min-Max Normalization</option>
+                            <option value="zscore">Z-Score Standardization</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyTransformation()">Apply Transformation</button>
+                    <div id="transformResults"></div>
+                </div>
+            </div>
+
+            <!-- Advanced Charts Section -->
+            <div class="section" id="advanced-charts">
+                <div class="card">
+                    <h2>Scatter Plot with Trend Line</h2>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>X Axis:</label>
+                            <select id="scatterX"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Y Axis:</label>
+                            <select id="scatterY"></select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateScatterPlot()">Generate Plot</button>
+                    <div class="chart-container">
+                        <canvas id="scatterChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Box Plot</h2>
+                    <div class="form-group">
+                        <label>Select Column:</label>
+                        <select id="boxColumn"></select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateBoxPlot()">Generate Box Plot</button>
+                    <div class="chart-container">
+                        <canvas id="boxChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Correlation Heatmap</h2>
+                    <button class="btn btn-primary" onclick="generateHeatmap()">Generate Heatmap</button>
+                    <div id="heatmapContainer"></div>
+                </div>
+            </div>
+
+            <!-- Cleaning Section -->
+            <div class="section" id="cleaning">
+                <div class="card">
+                    <h2>Data Quality Analysis</h2>
+                    <button class="btn btn-primary" onclick="analyzeDataQuality()">Analyze Data Quality</button>
+                    <div id="qualityResults"></div>
+                </div>
+                <div class="card">
+                    <h2>Missing Value Imputation</h2>
+                    <div class="form-group">
+                        <label>Select Column:</label>
+                        <select id="imputeColumn"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Imputation Method:</label>
+                        <select id="imputeMethod">
+                            <option value="mean">Mean</option>
+                            <option value="median">Median</option>
+                            <option value="mode">Mode</option>
+                            <option value="remove">Remove Rows</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="imputeMissingValues()">Apply Imputation</button>
+                    <div id="imputeResults"></div>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="section" id="export">
+                <div class="card">
+                    <h2>Export Data &amp; Results</h2>
+                    <div class="flex-row">
+                        <button class="btn btn-primary" onclick="exportToJSON()">Export as JSON</button>
+                        <button class="btn btn-primary" onclick="exportToCSV()">Export as CSV</button>
+                        <button class="btn btn-secondary" onclick="exportStatistics()">Export Statistics</button>
+                    </div>
+                    <div id="exportStatus"></div>
+                </div>
+            </div>
+
+            <!-- SQL Section -->
+            <div class="section" id="sql">
+                <div class="card">
+                    <h2>SQL-Like Query Interface</h2>
+                    <div class="form-group">
+                        <label>Filter (WHERE):</label>
+                        <input type="text" id="sqlWhere" placeholder="e.g., Age > 25">
+                    </div>
+                    <div class="form-group">
+                        <label>Order By:</label>
+                        <select id="sqlOrderBy"></select>
+                        <select id="sqlOrderDir">
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Limit:</label>
+                        <input type="number" id="sqlLimit" value="10" min="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="executeQuery()">Execute Query</button>
+                    <div id="queryResults"></div>
+                </div>
+            </div>
+
+            <!-- Pivot Section -->
+            <div class="section" id="pivot">
+                <div class="card">
+                    <h2>Pivot Table Generator</h2>
+                    <div class="form-group">
+                        <label>Row:</label>
+                        <select id="pivotRow"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Column:</label>
+                        <select id="pivotCol"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Value:</label>
+                        <select id="pivotValue"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Aggregation:</label>
+                        <select id="pivotAgg">
+                            <option value="sum">SUM</option>
+                            <option value="avg">AVERAGE</option>
+                            <option value="count">COUNT</option>
+                            <option value="min">MIN</option>
+                            <option value="max">MAX</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generatePivotTable()">Generate Pivot Table</button>
+                    <div id="pivotResults"></div>
+                </div>
+            </div>
+
+            <!-- Forecasting Section -->
+            <div class="section" id="forecasting">
+                <div class="card">
+                    <h2>Time Series Forecasting</h2>
+                    <div class="form-group">
+                        <label>Select Time/Index Column:</label>
+                        <select id="forecastIndex"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Value Column:</label>
+                        <select id="forecastValue"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Forecast Periods:</label>
+                        <input type="number" id="forecastPeriods" value="5" min="1" max="20">
+                    </div>
+                    <button class="btn btn-primary" onclick="generateForecast()">Generate Forecast</button>
+                    <div id="forecastResults"></div>
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wrangling Section -->
+            <div class="section" id="wrangling">
+                <div class="card">
+                    <h2>Merge Columns</h2>
+                    <div class="form-group">
+                        <label>Column 1:</label>
+                        <select id="mergeCol1"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Column 2:</label>
+                        <select id="mergeCol2"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Separator:</label>
+                        <input type="text" id="mergeSep" value=" " placeholder="Space">
+                    </div>
+                    <div class="form-group">
+                        <label>New Column Name:</label>
+                        <input type="text" id="mergeNewName" placeholder="MergedColumn">
+                    </div>
+                    <button class="btn btn-primary" onclick="mergeColumns()">Merge Columns</button>
+                    <div id="mergeResults"></div>
+                </div>
+                <div class="card">
+                    <h2>Split Column</h2>
+                    <div class="form-group">
+                        <label>Column to Split:</label>
+                        <select id="splitCol"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Delimiter:</label>
+                        <input type="text" id="splitDelim" value=" " placeholder="Space">
+                    </div>
+                    <button class="btn btn-primary" onclick="splitColumn()">Split Column</button>
+                    <div id="splitResults"></div>
+                </div>
+                <div class="card">
+                    <h2>Column Formula</h2>
+                    <div class="form-group">
+                        <label>Formula (use col['ColumnName']):</label>
+                        <input type="text" id="formulaExpr" placeholder="e.g., col['Age'] * 2">
+                    </div>
+                    <div class="form-group">
+                        <label>New Column Name:</label>
+                        <input type="text" id="formulaNewName" placeholder="NewColumn">
+                    </div>
+                    <button class="btn btn-primary" onclick="applyFormula()">Apply Formula</button>
+                    <div id="formulaResults"></div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div class="section" id="dashboard">
+                <div class="card">
+                    <h2>Custom Dashboard</h2>
+                    <button class="btn btn-primary" onclick="buildDashboard()">Build Dashboard</button>
+                    <div class="dashboard-grid" id="dashboardWidgets"></div>
+                </div>
+            </div>
+
+            <!-- AI Insights Section -->
+            <div class="section" id="ai-insights">
+                <div class="card">
+                    <h2>AI-Powered Insights</h2>
+                    <button class="btn btn-primary" onclick="generateInsights()">Generate Insights</button>
+                    <div id="insightsResults"></div>
+                </div>
+            </div>
+
+            <!-- Advanced ML Section -->
+            <div class="section" id="advanced-ml">
+                <div class="card">
+                    <h2>Decision Tree Analysis</h2>
+                    <div class="form-group">
+                        <label>Target Column:</label>
+                        <select id="dtTarget"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Feature Columns (hold Ctrl for multiple):</label>
+                        <select id="dtFeatures" multiple style="height: 100px;"></select>
+                    </div>
+                    <button class="btn btn-primary" onclick="runDecisionTree()">Run Decision Tree</button>
+                    <div id="dtResults"></div>
+                </div>
+                <div class="card">
+                    <h2>Time Series Decomposition</h2>
+                    <div class="form-group">
+                        <label>Time Column:</label>
+                        <select id="tsCol"></select>
+                    </div>
+                    <button class="btn btn-primary" onclick="decomposeTimeSeries()">Decompose Time Series</button>
+                    <div id="tsResults"></div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="section" id="features">
+                <div class="card">
+                    <h2>Platform Features</h2>
+                    <ul class="feature-list">
+                        <li><strong>CSV/TSV Upload:</strong> Drag-and-drop or paste data directly</li>
+                        <li><strong>Real-time Analysis:</strong> All calculations executed instantly</li>
+                        <li><strong>17 Modules:</strong> From basic stats to advanced ML algorithms</li>
+                        <li><strong>Interactive Visualizations:</strong> Charts update with your data</li>
+                        <li><strong>Data Transformation:</strong> Normalize, standardize, clean your data</li>
+                        <li><strong>SQL Queries:</strong> Filter and sort data with SQL-like syntax</li>
+                        <li><strong>Pivot Tables:</strong> Dynamic aggregations and grouping</li>
+                        <li><strong>Forecasting:</strong> Linear trend predictions</li>
+                        <li><strong>Machine Learning:</strong> Regression, clustering, decision trees</li>
+                        <li><strong>Export Capabilities:</strong> Download results as CSV or JSON</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
